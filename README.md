@@ -1,6 +1,6 @@
 # FlakePack: A decentralized, k-ordered id generation msgpack service in Scala
 
-FlakePack is a port of [Flake]("https://github.com/boundary/flake") to Scala.
+FlakePack is a port of [Flake](https://github.com/boundary/flake) to Scala.
 
 FlakePack produces 128-bit, k-ordered ids (read time-ordered lexically). Run one on each node in your infrastructure and they will generate conflict-free ids on-demand without coordination.
 
