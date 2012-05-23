@@ -1,4 +1,4 @@
-# FlakePack: A decentralized, k-ordered id generation msgpack service in Scala
+# FlakePack: A decentralized, k-ordered id generation MessagePack service in Scala
 
 FlakePack is a port of [Flake](https://github.com/boundary/flake) to Scala.
 
@@ -6,9 +6,9 @@ FlakePack produces 128-bit, k-ordered ids (read time-ordered lexically). Run one
 
 Read the original [post](http://blog.boundary.com/2012/01/12/flake-a-decentralized-k-ordered-unique-id-generator-in-erlang/) on the Boundary blog.
 
-FlakePack uses a msgpack-rpc interface through Netty to send it's ids.
+FlakePack uses a MessagePack RPC interface through Netty to send it's ids.
 
-After building the right versions for msgpack-rpc (Java) and msgpack-scala, you can run the service through SBT:
+After building / getting the right versions for msgpack-rpc (Java) and msgpack-scala, you can run the service through SBT:
 
 	sbt run
 
@@ -24,7 +24,7 @@ You can run a simple test suite to check if everything is working correctly:
 
 # Deployment
 
-FlakePack is a standalone application. Request ids with a <tt>generateID</tt> through the msgpack interface.
+FlakePack is a standalone application. Request ids with a <tt>generateID</tt> through a MessagePack interface.
 
 # Anatomy
 
