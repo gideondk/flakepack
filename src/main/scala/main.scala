@@ -1,6 +1,6 @@
 import java.math.BigInteger
 import java.net.{NetworkInterface, InetAddress}
-import org.msgpack.rpc.{Client, Request, Server}
+import org.msgpack.rpc.{Request, Server}
 import org.msgpack.ScalaMessagePack
 import org.msgpack.rpc.loop.EventLoop
 
@@ -46,8 +46,23 @@ class IdServer(workerId: Long, var sequence: Long = 0L) extends org.msgpack.rpc.
   }
 
   def dispatch(request: Request): Unit = {
-    if (request.getMethodName == "generateID") request.sendResult(Base62.encode(nextId))
-    else request.sendError("Method unknown.")
+    request.getMethodName match {
+      case "generateIDs" => {
+        try {
+          println(request.getArguments)
+          val numberOfIds = request.getArguments.asArrayValue().get(0).asIntegerValue().getInt
+          request.sendResult {
+            val idl = for (i <- 1 to numberOfIds) yield Base62.encode(nextId)
+            idl.toList
+          }
+        }
+        catch {
+          case e => println(e); request.sendError("Use a integer to send the number of ids to generate")
+        }
+      }
+      case "generateID" => request.sendResult(Base62.encode(nextId))
+      case _ => request.sendError("Method unknown.")
+    }
   }
 }
 

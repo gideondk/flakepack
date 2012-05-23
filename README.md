@@ -25,6 +25,7 @@ You can run a simple test suite to check if everything is working correctly:
 # Deployment
 
 FlakePack is a standalone application. Request ids with a <tt>generateID</tt> through a MessagePack interface.
+If you want to the service to generate multiple ids in one batch, use the generateIDs method and pass the number of ids as a int.
 
 # Anatomy
 
