@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Flakepack by gideondk</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Flakepack</h1>
+        <p>A decentralized, k-ordered id generation msgpack service in Scala</p>
+        <p class="view"><a href="https://github.com/gideondk/flakepack">View the Project on GitHub <small>gideondk/flakepack</small></a></p>
+        <ul>
+          <li><a href="https://github.com/gideondk/flakepack/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/gideondk/flakepack/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/gideondk/flakepack">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>FlakePack: A decentralized, k-ordered id generation MessagePack service in Scala</h1>
+
+<p>FlakePack is a port of <a href="https://github.com/boundary/flake">Flake</a> to Scala.</p>
+
+<p>FlakePack produces 128-bit, k-ordered ids (read time-ordered lexically). Run one on each node in your infrastructure and they will generate conflict-free ids on-demand without coordination.</p>
+
+<p>Read the original <a href="http://blog.boundary.com/2012/01/12/flake-a-decentralized-k-ordered-unique-id-generator-in-erlang/">post</a> on the Boundary blog.</p>
+
+<p>FlakePack uses a MessagePack RPC interface through Netty to send it's ids.</p>
+
+<p>After building / getting the right versions for msgpack-rpc (Java) and msgpack-scala, you can run the service through SBT:</p>
+
+<pre><code>sbt run
+</code></pre>
+
+<p>This will start the service on your "localhost" ethernet device, with 6000 as default port.
+You can change the default ethernet device and port while starting up:</p>
+
+<pre><code>sbt "run en0 17000"
+</code></pre>
+
+<p>You can run a simple test suite to check if everything is working correctly:</p>
+
+<pre><code>sbt test
+</code></pre>
+
+<h1>Deployment</h1>
+
+<p>FlakePack is a standalone application. Request ids with a <tt>generateID</tt> through a MessagePack interface.
+If you want to the service to generate multiple ids in one batch, use the generateIDs method and pass the number of ids as a int.</p>
+
+<h1>Anatomy</h1>
+
+<p>FlakePack ids are 128-bits wide described here from most significant to least significant bits.</p>
+
+<ul>
+<li>64-bit timestamp - milliseconds since the epoch (Jan 1 1970)</li>
+<li>48-bit worker id - MAC address from a configurable device</li>
+<li>16-bit sequence # - usually 0, incremented when more than one id is requested in the same millisecond and reset to 0 when the clock ticks forward</li>
+</ul><h1>Frequently Asked Questions</h1>
+
+<p><strong>How does this differ from snowflake developed at Twitter?</strong></p>
+
+<p>The differences stem primarily from the fact that Twitter snowflake ids are 64-bits wide. This means that additional coordination is required to pick a worker id (twitter does this via a ZooKeeper ensemble) and a new epoch must be defined so that timestamps can fit into a small number of bits. Their scheme works great when your ids must fit into 64-bits. However this comes at the cost of additional coordination among nodes and a system that is generally a little more difficult to reason about. It is a fine system though and we were able to learn from it in our efforts.</p>
+
+<p><strong>How is FlakePack different from rearranging the bits of a UUID-1 id?</strong></p>
+
+<p>First, successive UUID versions aim to make ids increasingly <em>opaque</em> in nature through various means. We have actually found a great deal of utility in structurally transparent unique ids and that has motivated much of this work.  The most transparent variant is UUID-1 (for which it has received a fair bit of criticism) and thus the nearest relative to a flakepack id. There are some important differences though.</p>
+
+<p>UUID-1 is an odd beast. First, the timestamp is based on the number of 100 nanosecond intervals since October 15, 1582. This is not how most of us familiar with Unix timestamps reason about time. If that isn't bad enough, the timestamp is an odd 60-bits in length with the most significant bits shifted to the least significant bits of the UUID. This property makes lexical ordering essentially meaningless. The remaining bits contain a clock id (initially set to a random number) and a node id (usually the MAC address).</p>
+
+<p>The first problem is the timestamp. We could rearrange the bits to get some k-ordering love, but reasoning on timestamps of this nature makes reasoning about the resulting ids more complex than it needs to be. This is why flakepack uses a standard 64-bit Unix timestamp, unaltered, as the most significant bits.</p>
+
+<p>The next problem is clock skew and protection against replaying ids for a time in the past. The UUID-1 spec dictates that the clock id be incremented in such an event, but this behavior is implementation-specific and we aren't aware of any Erlang implementations that met our safety goals. Flake durably writes a timestamp to a dets table periodically while running. Following a restart, flakepack will refuse to startup if the timestamp written there is from the future. Furthermore, flakepack will refuse to generate ids if it detects that the system clock is running backwards.</p>
+
+<p><strong>When are FlakePack ids <em>not</em> appropriate?</strong></p>
+
+<p>Flake ids are predictable by design. Don't use use flakepack to generate ids that you'd rather be unpredictable. Don't use flakepack to generate passwords, security tokens, or anything else you wouldn't want someone to be able to guess.</p>
+
+<p>Flake ids expose the identity of the machine which generated the id (by way of its MAC address) and the time at which it did so. This could be a problem for some security-sensitive applications.</p>
+
+<p>Don't do modulo 2 arithmetic on flakepack ids with the expectation of random distribution. The least significant 16-bits are usually going to be 0 on a machine that is generating an average of one or fewer ids per millisecond.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/gideondk">gideondk</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
