@@ -47,7 +47,7 @@ class FlakePackSuite extends FunSuite {
     shutDownServerAndClient(server, client)
 
     var allSorted = true
-    for (i <- 0 to uids.length - 2) allSorted = uids(0) < uids(1)
+    for (i <- 0 to uids.length - 2) allSorted = uids(i) < uids(i+1)
     assert(allSorted)
   }
 
@@ -92,7 +92,7 @@ class FlakePackSuite extends FunSuite {
     shutDownServerAndClient(server, client)
 
     var allSorted = true
-    for (i <- 0 to uids.length - 2) allSorted = uids(0) < uids(1)
+    for (i <- 0 to uids.length - 2) allSorted = uids(i) < uids(i+1)
     assert(allSorted)
   }
 }

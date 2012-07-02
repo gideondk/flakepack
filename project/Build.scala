@@ -1,3 +1,4 @@
+import com.github.retronym.SbtOneJar
 import sbt._
 import Keys._
 
@@ -27,7 +28,7 @@ object ApplicationBuild extends Build {
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
       libraryDependencies ++= appDependencies,
-      mainClass := Some("Main")
-    )
+      mainClass := Some("Main") 
+    ) ++ SbtOneJar.oneJarSettings
   )
 }
