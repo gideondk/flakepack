@@ -32,8 +32,6 @@ class FlakePackSuite extends FunSuite {
       client.callApply("generateID", Array[java.lang.Object]()).toString()
     }
 
-    println(uids.length)
-    println(uids.distinct.length)
     shutDownServerAndClient(server, client)
 
     assert(uids.length == uids.distinct.length)

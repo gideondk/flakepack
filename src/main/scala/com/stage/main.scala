@@ -19,8 +19,6 @@ object Main {
 
     println("Starting server on port " + port)
     server.listen(port)
-
-    //ScalaServer.withServeObject(new IdGeneratorService(macAddr)).listen(port)
   }
 
   def getMacAddressAsLong(interface: Option[String] = None) = try {
