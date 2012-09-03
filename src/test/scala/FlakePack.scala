@@ -1,5 +1,6 @@
-import org.msgpack.rpc.loop.EventLoop
+import com.stage.{IdGeneratorService, IdGenerator}
 import org.msgpack.rpc.{Client, Server}
+import org.msgpack.rpc.loop.EventLoop
 import org.msgpack.ScalaMessagePack
 import org.scalatest.FunSuite
 
@@ -8,7 +9,7 @@ class FlakePackSuite extends FunSuite {
   def initNewServer = {
     val loop = EventLoop.start(new ScalaMessagePack)
     val server = new Server(loop)
-    server.serve(new IdServer(0))
+    server.serve(new IdGeneratorService(0))
     server.listen(17000)
     server
   }
@@ -31,6 +32,8 @@ class FlakePackSuite extends FunSuite {
       client.callApply("generateID", Array[java.lang.Object]()).toString()
     }
 
+    println(uids.length)
+    println(uids.distinct.length)
     shutDownServerAndClient(server, client)
 
     assert(uids.length == uids.distinct.length)
